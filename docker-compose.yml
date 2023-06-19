@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  database:
+    build: ./db
+    networks:
+      - app-network
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - '8090:8080'
+    networks:
+      - app-network
+    depends_on:
+      - database
+
+  backend:
+    build: ./api/simple-api-student
+    networks:
+      - app-network
+    depends_on:
+      - database
+
+  httpd:
+    build: ./http
+    ports:
+      - '80:80'
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+networks:
+  app-network:
+
+volumes:
+  pg_data:
